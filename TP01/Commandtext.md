@@ -121,3 +121,55 @@ ServerName localhost
 ```
 
 >docker run --name my-running-app -p 80:80 --network app-network web_server
+
+
+- Docker compose 
+
+>docker-compose up
+>docker-compose up --build
+>docker-compose restart api
+
+```docker
+
+version: '3.3'
+services:
+  api:
+    build:
+      ./Javaa/simple-api-main
+    networks:
+      - my-network
+    depends_on:
+      - database
+
+  database:
+    build:
+      ./postgre_bdd
+    networks:
+      - my-network
+
+  httpd:
+    build:
+      ./http_server
+    ports:
+      - 80:80
+    networks:
+      - my-network
+    depends_on:
+      - api
+
+networks:
+  my-network: 
+
+
+```
+
+
+- Publish
+
+> docker tag tp01_httpd heavenshk/httpd:1.0
+> docker tag tp01_api heavenshk/api:1.0
+>  docker tag tp01_database heavenshk/database:1.0
+
+> docker push heavenshk/httpd:1.0
+> docker push heavenshk/api:1.0
+> docker push heavenshk/database:1.0

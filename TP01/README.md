@@ -15,5 +15,10 @@
 > Pour build le package (jdk) tout d'abord.
 puis pour éxecuter le -jar avec le JRE. le JRE reste plus léger
 
+#### Why do we need a reverse proxy ?
 
 
+
+#### Why is docker-compose so important ?
+
+#### Why do we put our images into an online repository ?
