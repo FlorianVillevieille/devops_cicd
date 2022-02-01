@@ -77,3 +77,47 @@ WORKDIR $MYAPP_HOME
 COPY --from=myapp-build $MYAPP_HOME/target/*.jar $MYAPP_HOME/myapp.jar
 ENTRYPOINT java -jar myapp.jar
 ```
+>docker rm -f backend
+- Api
+
+
+
+
+- Apache
+
+>docker build -t web_server .
+
+```docker
+FROM httpd:2.4
+COPY index.html /usr/local/apache2/htdocs/
+```
+
+>docker run -dit --name my-running-app -p 8082:80 --network app-network web_server
+
+Configuration en vue de faire le reverse proxy
+>docker run --rm httpd:2.4 cat /usr/local/apache2/conf/httpd.conf > my-httpd.conf
+
+-Config du dockerfile :
+
+```docker
+FROM httpd:2.4
+COPY ./my-httpd.conf /usr/local/apache2/conf/httpd.conf
+```
+
+
+
+- Reverse proxy :
+
+```docker
+
+ServerName localhost
+
+<VirtualHost *:80>
+    ProxyPreserveHost On
+    ProxyPass / http://api:8080/
+    ProxyPassReverse / http://api:8080/
+</VirtualHost>
+
+```
+
+>docker run --name my-running-app -p 80:80 --network app-network web_server

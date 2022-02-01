@@ -1,0 +1,28 @@
+version: '3.3'
+services:
+  api:
+    build:
+      ./Javaa/simple-api-main
+    networks:
+      - my-network
+    depends_on:
+      - database
+
+  database:
+    build:
+      ./postgre_bdd
+    networks:
+      - my-network
+
+  httpd:
+    build:
+      ./http_server
+    ports:
+      - 80:80
+    networks:
+      - my-network
+    depends_on:
+      - api
+
+networks:
+  my-network: 
