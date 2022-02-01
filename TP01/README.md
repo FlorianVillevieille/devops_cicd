@@ -17,8 +17,18 @@ puis pour éxecuter le -jar avec le JRE. le JRE reste plus léger
 
 #### Why do we need a reverse proxy ?
 
-
+# TP2
 
 #### Why is docker-compose so important ?
 
+#### 2-1 What are testcontainers?
+
 #### Why do we put our images into an online repository ?
+
+> pour avoir du versionning d'images
+
+
+
+
+
+#### Secured variables, why ?

@@ -20,3 +20,51 @@ jobs:
       #finally build your app with the latest command
       - name: Build and test with Maven
         run: mvn clean verify --file ./TP01/Javaa/simple-api-main/simple-api
+
+
+
+ # define job to build and publish docker image
+  build-and-push-docker-image:
+    needs: test-backend
+    # run only when code is compiling and tests are passing
+    runs-on: ubuntu-latest
+    # steps to perform in job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # login to docker
+      - name: Login to DockerHub
+        run: docker login -u ${{ secrets.USERDOCKERHUB }} -p ${{secrets.TOKENDOCKERHUB }}
+
+      - name: Build image and push backend
+        uses: docker/build-push-action@v2
+        with:
+          # relative path to the place where source code with Dockerfile is located
+          context: ./TP01/Javaa/simple-api-main
+          # Note: tags has to be all lower-case
+          tags:
+            ${{secrets.USERDOCKERHUB}}/tp-devops-cpe:backend
+          # push action
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push database
+        uses: docker/build-push-action@v2
+        with:
+          # relative path to the place where source code with Dockerfile is located
+          context: ./TP01/postgre_bdd
+          tags:
+            ${{secrets.USERDOCKERHUB}}/tp-devops-cpe:db
+          # push action
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v2
+        with:
+          # relative path to the place where source code with Dockerfile is located
+          context: ./TP01/http_server
+          # Note: tags has to be all lower-case
+          tags:
+            ${{secrets.USERDOCKERHUB}}/tp-devops-cpe:simple-frontend
+          # push action
+          push: ${{ github.ref == 'refs/heads/main' }}

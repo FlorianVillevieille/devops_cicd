@@ -173,3 +173,42 @@ networks:
 > docker push heavenshk/httpd:1.0
 > docker push heavenshk/api:1.0
 > docker push heavenshk/database:1.0
+
+
+
+# TP2
+
+>git add .
+>git commit -m "oui"
+>git push
+
+```yml
+
+name: CI devops 2022 CPE
+on:
+  #to begin you want to launch this job in main and develop
+  push:
+    branches: main
+  pull_request:
+jobs:
+  test-backend:
+    runs-on: ubuntu-18.04
+    steps:
+      #checkout your github code using actions/checkout@v2.3.3
+      - uses: actions/checkout@v2.3.3
+
+      #do the same with another action (actions/setup-java@v2) thatenable to setup jdk 11
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+            java-version: '11'
+            distribution: 'adopt'
+      #finally build your app with the latest command
+      - name: Build and test with Maven
+        run: mvn clean verify --file ./TP01/Javaa/simple-api-main/simple-api
+
+
+```
+
+>docker login -u heavenshk
+>Secret dans github
