@@ -19,7 +19,7 @@ jobs:
             distribution: 'adopt'
       #finally build your app with the latest command
       - name: Build and test with Maven
-        run: mvn clean verify --file ./TP01/Javaa/simple-api-main/simple-api
+        run: mvn -B verify sonar:sonar -Dsonar.projectKey=FlorianVillevieille_devops_cicd -Dsonar.organization=florianvillevieille -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{secrets.SONARTOKEN }} --file ./TP01/Javaa/simple-api-main/simple-api/pom.xml
 
 
 
