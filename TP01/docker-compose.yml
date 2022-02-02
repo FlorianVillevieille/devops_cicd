@@ -24,5 +24,13 @@ services:
     depends_on:
       - api
 
+  frontend:
+    build:
+      ./../TP03/devops-front-main
+    networks:
+      - my-network
+    depends_on:
+      - api
+
 networks:
   my-network: 
