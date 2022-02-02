@@ -3,6 +3,6 @@
 - name: Create a front container
   docker_container:
     name: front
-    image: cathvdh/httpd:latest
+    image: heavenshk/tp-devops-cpe/simple-front
     networks: 
       - name: app-network
