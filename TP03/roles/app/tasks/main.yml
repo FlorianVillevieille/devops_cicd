@@ -1,0 +1,12 @@
+---
+# tasks file for roles/app
+- name: api
+  docker_container:
+    name: api
+    image: heavenshk/api:1.0
+    exposed_ports: 
+      - 80:80
+    state: started
+    networks:
+      - name: app-network
+     

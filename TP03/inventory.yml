@@ -1,0 +1,7 @@
+all:
+  vars:
+    ansible_user: centos
+    ansible_ssh_private_key_file: /fs03/share/users/florian.villevieille/home/Bureau/id_rsa
+  children:
+    prod:
+      hosts: florian.villevieille.takima.cloud

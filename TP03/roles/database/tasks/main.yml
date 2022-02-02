@@ -1,0 +1,14 @@
+---
+# tasks file for roles/database
+
+- name: DATABASE
+  docker_container:
+    name: database
+    image: heavenshk/database:1.0
+    state: started
+    env:
+      POSTGRES_DB: db
+      POSTGRES_USR: usr
+      POSTGRES_PASSWORD: pwd
+    networks:
+      - name: app-network
