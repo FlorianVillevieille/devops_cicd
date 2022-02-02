@@ -1,0 +1,8 @@
+---
+# tasks file for roles/front
+- name: Create a front container
+  docker_container:
+    name: front
+    image: heavenshk/tp-devops-cpe/simple-front:latest
+    networks: 
+      - name: app-network

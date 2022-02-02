@@ -71,3 +71,14 @@ jobs:
             ${{secrets.USERDOCKERHUB}}/tp-devops-cpe:simple-frontend
           # push action
           push: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Build image and push front
+        uses: docker/build-push-action@v2
+        with:
+          # relative path to the place where source code with Dockerfile is located
+          context: ./TP03/devops-front-main
+          # Note: tags has to be all lower-case
+          tags:
+            ${{secrets.USERDOCKERHUB}}/tp-devops-cpe:simple-front
+          # push action
+          push: ${{ github.ref == 'refs/heads/main' }}

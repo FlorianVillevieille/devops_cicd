@@ -439,3 +439,23 @@ florian.villevieille.takima.cloud | CHANGED => {
     networks:
       - name: app-network
 ```
+
+- dans le httpd.conf
+```yml
+ 
+    ProxyPass / http://frontend:80/
+    ProxyPassReverse / http://frontend:80/
+
+```
+
+- creation du docker
+```yml
+  frontend:
+    build:
+      ./../TP03/devops-front-main
+    networks:
+      - my-network
+    depends_on:
+      - api
+
+```
