@@ -27,8 +27,10 @@ puis pour éxecuter le -jar avec le JRE. le JRE reste plus léger
 
 > pour avoir du versionning d'images
 
-
+ 
 
 
 
 #### Secured variables, why ?
+
+#### For what purpose do we need to push docker images?
