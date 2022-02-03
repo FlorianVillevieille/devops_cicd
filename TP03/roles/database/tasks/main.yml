@@ -4,7 +4,7 @@
 - name: DATABASE
   docker_container:
     name: database
-    image: heavenshk/database:1.0
+    image: heavenshk/tp-devops-cpe:db
     state: started
     env:
       POSTGRES_DB: db

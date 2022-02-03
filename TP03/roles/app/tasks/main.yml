@@ -3,7 +3,7 @@
 - name: api
   docker_container:
     name: api
-    image: heavenshk/api:1.0
+    image: heavenshk/tp-devops-cpe:backend
     networks:
       - name: app-network
      
