@@ -4,24 +4,26 @@
 Florian VILLEVIEILLE - 4IRC
 
 Informations complémentaires :
-- Dans mon architecture se trouve deux fichiers, Backend et Javaa.
+- Dans mon architecture se trouve deux fichiers, Backend et Javaa. Le dossier Backend est l'api généré et non pas donné par vous au long du TP. Elle n'est plus utilisé par la suite, seule le dossier Javaa reste utilisé malgrè le nom "Backend" utilisé plusieurs fois
 - Certains fichiers Docker/Docker-compose/Github actions ont été documentés dans un second temps, il se peut que les commentaires n'apparaissent que dans le READ-me et pas le fichier originel :)
 
 # Base de données
 
 ## Créer un réseau :
-
->docker network create app-network
+```
+docker network create app-network
+```
 
 ## Base de données : Le Run
-
->docker run -p 8888:5000 --name database --network app-network  heavenshk/database
-
+```
+docker run -p 8888:5000 --name database --network app-network  heavenshk/database
+```
 
 ## Adminer : Le Run
 
->docker run --network=app-network -p 8080:8080 adminer
-
+```
+docker run --network=app-network -p 8080:8080 adminer
+```
 
 ##  Dockerfile de la base de données
 
@@ -39,9 +41,9 @@ COPY /02-insertData.sql /docker-entrypoint-initdb.d
 
 
 ## Persistence des données
-
->docker run -p 8888:5000 --name database -v /tmp/data:/var/lib/postgresql/data --network app-network  heavenshk/database
-
+```
+docker run -p 8888:5000 --name database -v /tmp/data:/var/lib/postgresql/data --network app-network  heavenshk/database
+```
 
 
 # Coté Backend : Le Java
@@ -55,11 +57,13 @@ RUN javac Main.java
 CMD ["java", "Main"]
 ```
 ## Build des images docker :
- >docker build -t my-java-app .
-
+```
+docker build -t my-java-app .
+```
 ## Run :
- >docker run -it --rm --name my-running-app my-java-app
-
+```
+docker run -it --rm --name my-running-app my-java-app
+```
 - Le shell affiche : 
 > "Hello World"
 
@@ -67,8 +71,9 @@ CMD ["java", "Main"]
 ```ne pas oublier de kill le processus database pour faire fonctionner sur le port 8080 ou changer de port ```
 
 ## Spring
->docker run -d --name backend -p 8080:8080 heavenshk/backend
-
+```
+docker run -d --name backend -p 8080:8080 heavenshk/backend
+```
 ## Docker file Spring
 ```docker
 # Build
@@ -92,19 +97,23 @@ Cette commande permet de supprimer les processus docker qui tournent en fond
 # Le serveur HTTP
 
 ## Build :
->docker build -t web_server .
-
+```
+docker build -t web_server .
+```
 ## Docker file du serveur HTTP
 ```docker
 FROM httpd:2.4
 COPY index.html /usr/local/apache2/htdocs/
 ```
 ## Lancement de l'application Web
->docker run -dit --name my-running-app -p 8082:80 --network app-network web_server
+```
+docker run -dit --name my-running-app -p 8082:80 --network app-network web_server
+```
 
 ## Modification de la configuration en vue de faire du reverse proxy
->docker run --rm httpd:2.4 cat /usr/local/apache2/conf/httpd.conf > my-httpd.conf
-
+```
+docker run --rm httpd:2.4 cat /usr/local/apache2/conf/httpd.conf > my-httpd.conf
+```
 ## Modification du dockerfile pour ajouter ces lignes et permettre d'utiliser le fichier de configuration initial :
 
 ```docker
@@ -128,18 +137,17 @@ ServerName localhost
 
 ```
 ## Lancement de l'application web sur un réseau commun
-
->docker run --name my-running-app -p 80:80 --network app-network web_server
-
-
+```
+docker run --name my-running-app -p 80:80 --network app-network web_server
+```
 ## Quelques commandes pour manipuler docker compose 
-
+```
 >docker-compose up
 
 >docker-compose up --build
 
 >docker-compose restart api
-
+```
 ## Fichier docker-compose
 Ce fichier permet de lancer tous les processus docker en même temps, sans avoir à les démarrer un par un. Il tient compte des priorités et de chaques docker file.
 
@@ -179,6 +187,7 @@ networks:
 ## Publication des images que l'on utilise sur docker Hub.
 
 Cela permet de versionner les images et qu'elles soient accessible partout.
+```
 > docker tag tp01_httpd heavenshk/httpd:1.0
 
 > docker tag tp01_api heavenshk/api:1.0
@@ -191,13 +200,14 @@ Cela permet de versionner les images et qu'elles soient accessible partout.
 > docker push heavenshk/api:1.0
 
 > docker push heavenshk/database:1.0
-
+```
 
 
 -------------------------------------------
 # READ ME - TP2
 
 ## Quelques commandes git pour gérer au mieux son dossier git.
+```
 >git status
 
 >git add .
@@ -205,7 +215,8 @@ Cela permet de versionner les images et qu'elles soient accessible partout.
 >git commit -m "message"
 
 >git push origin master/main
-
+```
+# Github Actions
 ```yml
 
 name: CI devops 2022 CPE
@@ -329,10 +340,11 @@ Dans les "balises" context, on cherche à aller chercher les fichiers Dockerfile
 # READ ME - TP3
 
 ## Commandes ansible :
->ansible all -i inventory.yml -m ping
+```
+ansible all -i inventory.yml -m ping
+```
 
-
-Il est important de noter que le -i permet de passer par un host, car les PC de CPE ne permettait pas d'ouvrir le fichier /etc/host
+Il est important de noter que le -i permet de passer par un host, car les PC de CPE ne permettait pas d'ouvrir le fichier /etc/host. Il faut également une clef RSA
 
 ```yml
 
@@ -346,10 +358,11 @@ all:
       hosts: florian.villevieille.takima.cloud
 
 ```
->ansible all -i inventory.yml -m setup -a "filter=ansible_distribution*"
+Cette commande permet d'obtenir des informations sur la distribution
 
-
-
+```
+ansible all -i inventory.yml -m setup -a "filter=ansible_distribution*"
+```
 ```bash
 florian.villevieille.takima.cloud | SUCCESS => {
     "ansible_facts": {
@@ -367,16 +380,19 @@ florian.villevieille.takima.cloud | SUCCESS => {
 ```
 
 ## Installation d'apache
-> ansible all  -a “name=httpd state=present” --become -i inventory.yml
-
+```
+ansible all  -a “name=httpd state=present” --become -i inventory.yml
+```
 ## Page HTML Via Ansible
 
 ```html
 ansible all -a 'echo <html><h3>Je sais pas ce que je fais</h3></html> >> /var/www/html/index.html' --become -i inventory.yml
 ```
 ## Supprimer le serveur apache après le TD3
->ansible all -i inventory.yml -m yum -a "name=httpd state=absent" --become
+```
 
+ansible all -i inventory.yml -m yum -a "name=httpd state=absent" --become
+```
 ```bash
 florian.villevieille.takima.cloud | CHANGED => {
     "ansible_facts": {
@@ -394,11 +410,11 @@ florian.villevieille.takima.cloud | CHANGED => {
 
 
 ## Test avec un Playbook qui éxecute un ping
-
->ansible-playbook -i inventory.yml playbook.yml
-
+```
+ansible-playbook -i inventory.yml playbook.yml
+```
+## Playbook.yml :
 ```yml
-
 - hosts: all
   gather_facts: false
   become: yes
@@ -408,9 +424,9 @@ florian.villevieille.takima.cloud | CHANGED => {
 ```
 
 # Installation de docker
-
-
+```
 > ansible-playbook -i inventory.yml playbook.yml
+```
 ## Le playbook : 
 
 Ici on spécifie les configurations d'installations pour docker.
@@ -475,7 +491,7 @@ Ce fichier va permettre d'appeler tous les rôles que l'ont aura au préalable c
 - name: DATABASE
   docker_container:
     name: database
-    image: heavenshk/database:1.0
+    image: heavenshk/tp-devops-cpe:db
     state: started
     env:
       POSTGRES_DB: db
@@ -485,7 +501,7 @@ Ce fichier va permettre d'appeler tous les rôles que l'ont aura au préalable c
       - name: app-network
 ```
 
-## main.yml pour roles/app
+## main.yml pour l'api
 ```yml
 - name: api
   docker_container:
@@ -495,7 +511,24 @@ Ce fichier va permettre d'appeler tous les rôles que l'ont aura au préalable c
       - name: app-network
 ```
 
-## main.yml dans le httpd.conf
+
+## main.yml dans le front
+```yml
+- name: Create a front container
+  docker_container:
+    name: front
+    image: heavenshk/tp-devops-cpe:simple-front
+    networks: 
+      - name: app-network
+```
+## main.yml dans le network 
+```yml
+- name: Create network 
+  docker_network:
+    name: app-network
+```
+
+## dans le httpd.conf pour autoriser le front
 ```yml
  
     ProxyPass / http://frontend:80/
@@ -503,14 +536,3 @@ Ce fichier va permettre d'appeler tous les rôles que l'ont aura au préalable c
 
 ```
 
-## main.yml dans le docker
-```yml
-  frontend:
-    build:
-      ./../TP03/devops-front-main
-    networks:
-      - my-network
-    depends_on:
-      - api
-
-```
