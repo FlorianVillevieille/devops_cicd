@@ -1,20 +1,29 @@
-# terminal CMD
 
-## coté network
+----------
+# README - TP1
+Florian VILLEVIEILLE - 4IRC
+
+Informations complémentaires :
+- Dans mon architecture se trouve deux fichiers, Backend et Javaa.
+- Certains fichiers Docker/Docker-compose/Github actions ont été documentés dans un second temps, il se peut que les commentaires n'apparaissent que dans le READ-me et pas le fichier originel :)
+
+# Base de données
+
+## Créer un réseau :
 
 >docker network create app-network
 
-## coté DB
+## Base de données : Le Run
 
 >docker run -p 8888:5000 --name database --network app-network  heavenshk/database
 
 
-## coté adminer
+## Adminer : Le Run
 
 >docker run --network=app-network -p 8080:8080 adminer
 
 
-##  dockerfile de la base de données
+##  Dockerfile de la base de données
 
 ```docker
 FROM postgres:11.6-alpine
@@ -29,13 +38,15 @@ COPY /02-insertData.sql /docker-entrypoint-initdb.d
 ```
 
 
-- Persistence
+## Persistence des données
 
 >docker run -p 8888:5000 --name database -v /tmp/data:/var/lib/postgresql/data --network app-network  heavenshk/database
 
 
-## Java
 
+# Coté Backend : Le Java
+
+## Docker file du coté Backend :
 ```docker
 FROM openjdk:11
 COPY . /usr/src/myapp
@@ -43,24 +54,22 @@ WORKDIR /usr/src/myapp
 RUN javac Main.java
 CMD ["java", "Main"]
 ```
-- Build :
+## Build des images docker :
  >docker build -t my-java-app .
-- Run :
+
+## Run :
  >docker run -it --rm --name my-running-app my-java-app
 
 - Le shell affiche : 
 > "Hello World"
 
 
-
-
-## Backend
 ```ne pas oublier de kill le processus database pour faire fonctionner sur le port 8080 ou changer de port ```
 
-- Spring
+## Spring
 >docker run -d --name backend -p 8080:8080 heavenshk/backend
 
-- Docker file spring
+## Docker file Spring
 ```docker
 # Build
 FROM maven:3.6.3-jdk-11 AS myapp-build
@@ -77,27 +86,26 @@ WORKDIR $MYAPP_HOME
 COPY --from=myapp-build $MYAPP_HOME/target/*.jar $MYAPP_HOME/myapp.jar
 ENTRYPOINT java -jar myapp.jar
 ```
->docker rm -f backend
-- Api
+Cette commande permet de supprimer les processus docker qui tournent en fond
+>docker rm -f nomduprocessus /ou\ idduprocessus
 
+# Le serveur HTTP
 
-
-
-- Apache
-
+## Build :
 >docker build -t web_server .
 
+## Docker file du serveur HTTP
 ```docker
 FROM httpd:2.4
 COPY index.html /usr/local/apache2/htdocs/
 ```
-
+## Lancement de l'application Web
 >docker run -dit --name my-running-app -p 8082:80 --network app-network web_server
 
-Configuration en vue de faire le reverse proxy
+## Modification de la configuration en vue de faire du reverse proxy
 >docker run --rm httpd:2.4 cat /usr/local/apache2/conf/httpd.conf > my-httpd.conf
 
--Config du dockerfile :
+## Modification du dockerfile pour ajouter ces lignes et permettre d'utiliser le fichier de configuration initial :
 
 ```docker
 FROM httpd:2.4
@@ -105,8 +113,8 @@ COPY ./my-httpd.conf /usr/local/apache2/conf/httpd.conf
 ```
 
 
-
-- Reverse proxy :
+## Docker file du serveur HTTP
+Cette fois-ci, on autorise le reverse proxy. api ici correspond au docker de mon coté backend
 
 ```docker
 
@@ -119,15 +127,21 @@ ServerName localhost
 </VirtualHost>
 
 ```
+## Lancement de l'application web sur un réseau commun
 
 >docker run --name my-running-app -p 80:80 --network app-network web_server
 
 
-- Docker compose 
+## Quelques commandes pour manipuler docker compose 
 
 >docker-compose up
+
 >docker-compose up --build
+
 >docker-compose restart api
+
+## Fichier docker-compose
+Ce fichier permet de lancer tous les processus docker en même temps, sans avoir à les démarrer un par un. Il tient compte des priorités et de chaques docker file.
 
 ```docker
 
@@ -159,28 +173,38 @@ services:
 
 networks:
   my-network: 
-
-
 ```
 
 
-- Publish
+## Publication des images que l'on utilise sur docker Hub.
 
+Cela permet de versionner les images et qu'elles soient accessible partout.
 > docker tag tp01_httpd heavenshk/httpd:1.0
+
 > docker tag tp01_api heavenshk/api:1.0
+
 >  docker tag tp01_database heavenshk/database:1.0
 
+
 > docker push heavenshk/httpd:1.0
+
 > docker push heavenshk/api:1.0
+
 > docker push heavenshk/database:1.0
 
 
 
-# TP2
+-------------------------------------------
+# READ ME - TP2
+
+## Quelques commandes git pour gérer au mieux son dossier git.
+>git status
 
 >git add .
->git commit -m "oui"
->git push
+
+>git commit -m "message"
+
+>git push origin master/main
 
 ```yml
 
@@ -191,7 +215,7 @@ on:
     branches: main
   pull_request:
 jobs:
-  test-backend:
+  test-backend: #Ici on choisit l'OS
     runs-on: ubuntu-18.04
     steps:
       #checkout your github code using actions/checkout@v2.3.3
@@ -205,13 +229,19 @@ jobs:
             distribution: 'adopt'
       #finally build your app with the latest command
       - name: Build and test with Maven
+      #Maven est exécuté sur notre projet Java pour effectuer des tests
         run: mvn clean verify --file ./TP01/Javaa/simple-api-main/simple-api
-
 
 ```
 
+Ici Maven possède un outil de review de code. selon les paramètres que l'ont choisit, il est capable d'analyser et d'en ressortir une note. généralemnt les équipes projets utilise une barre à 80% avant d'envoyer ce code en production.
+
+
 >docker login -u heavenshk
->Secret dans github
+
+Les Secrets sont stockés dans github via des variables secrètes
+
+## Quality Gate configuration
 
 ```yml
 
@@ -221,7 +251,7 @@ on:
   push:
     branches: main
   pull_request:
-env:
+env: #Ici on rajoute une variable d'environnement pour le github token
   GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
   
 jobs:
@@ -239,6 +269,7 @@ jobs:
             distribution: 'adopt'
       #finally build your app with the latest command
       - name: Build and test with Maven
+      #Des tests Sonar ont été réalisés. on peut se connecter à Sonar grâce aux credentiels dans Github.
         run: mvn -B verify sonar:sonar -Dsonar.projectKey=FlorianVillevieille_devops_cicd -Dsonar.organization=florianvillevieille -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=${{secrets.SONARTOKEN }} --file ./TP01/Javaa/simple-api-main/simple-api/pom.xml
 
 
@@ -253,7 +284,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # login to docker
+      # login to docker avec les credentials de github secret
       - name: Login to DockerHub
         run: docker login -u ${{ secrets.USERDOCKERHUB }} -p ${{secrets.TOKENDOCKERHUB }}
 
@@ -265,7 +296,8 @@ jobs:
           # Note: tags has to be all lower-case
           tags:
             ${{secrets.USERDOCKERHUB}}/tp-devops-cpe:backend
-          # push action
+          # push action 
+          # /main pour la branche sur github
           push: ${{ github.ref == 'refs/heads/main' }}
 
       - name: Build image and push database
@@ -291,16 +323,32 @@ jobs:
 
 ```
 
+Dans les "balises" context, on cherche à aller chercher les fichiers Dockerfile de chaque image
 
-# TP3
+-------------------
+# READ ME - TP3
 
-
-
+## Commandes ansible :
 >ansible all -i inventory.yml -m ping
 
 
+Il est important de noter que le -i permet de passer par un host, car les PC de CPE ne permettait pas d'ouvrir le fichier /etc/host
 
+```yml
+
+all:
+  vars:
+    ansible_user: centos
+    ansible_ssh_private_key_file: /fs03/share/users/florian.villevieille/home/Workspace/id_rsa
+    #Le fichier contenant la clef n'est pas stocké sur le git
+  children:
+    prod:
+      hosts: florian.villevieille.takima.cloud
+
+```
 >ansible all -i inventory.yml -m setup -a "filter=ansible_distribution*"
+
+
 
 ```bash
 florian.villevieille.takima.cloud | SUCCESS => {
@@ -317,7 +365,16 @@ florian.villevieille.takima.cloud | SUCCESS => {
     "changed": false
 }
 ```
-- Supprimer le serveur apache
+
+## Installation d'apache
+> ansible all  -a “name=httpd state=present” --become -i inventory.yml
+
+## Page HTML Via Ansible
+
+```html
+ansible all -a 'echo <html><h3>Je sais pas ce que je fais</h3></html> >> /var/www/html/index.html' --become -i inventory.yml
+```
+## Supprimer le serveur apache après le TD3
 >ansible all -i inventory.yml -m yum -a "name=httpd state=absent" --become
 
 ```bash
@@ -335,6 +392,9 @@ florian.villevieille.takima.cloud | CHANGED => {
 }
 ```
 
+
+## Test avec un Playbook qui éxecute un ping
+
 >ansible-playbook -i inventory.yml playbook.yml
 
 ```yml
@@ -347,10 +407,13 @@ florian.villevieille.takima.cloud | CHANGED => {
       ping:
 ```
 
-- installation de docker
+# Installation de docker
+
 
 > ansible-playbook -i inventory.yml playbook.yml
-- le playbook : 
+## Le playbook : 
+
+Ici on spécifie les configurations d'installations pour docker.
 ```yml
 - hosts: all
   gather_facts: false
@@ -386,47 +449,29 @@ florian.villevieille.takima.cloud | CHANGED => {
     tags: docker
 ```
 
-- On ajoute ça dans le playbook pour les rôles
->   roles: - docker
 
-- main.yml
+Ce fichier va permettre d'appeler tous les rôles que l'ont aura au préalable configuré dans roles/"docker ou api ou front"/tasks/main.yml par exemple.
+
+### main.yml
+
 ```yml
----
-# tasks file for roles/docker
+- hosts: all
+  gather_facts: false
+  become: yes
 
-  - name: Clean packages
-    command:
-      cmd: dnf clean -y packages
-  - name: Install device-mapper-persistent-data
-    dnf:
-      name: device-mapper-persistent-data
-      state: latest
-  - name: Install lvm2
-    dnf:
-      name: lvm2
-      state: latest
-  - name: add repo docker
-    command:
-      cmd: sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
-  - name: Install Docker
-    dnf:
-      name: docker-ce
-      state: present
-  - name: install python3
-    dnf:
-      name: python3
-  - name: Pip install
-    pip:
-      name: docker
-  - name: Make sure Docker is running
-    service: name=docker state=started
-    tags: docker
-
+  roles:
+    - docker
+    - network
+    - database
+    - app
+    - proxy
+    - front
+    
 ```
 
-- Main.yml pour la database, un exemple
-```yml
 
+## Main.yml pour la database, un exemple
+```yml
 - name: DATABASE
   docker_container:
     name: database
@@ -440,7 +485,17 @@ florian.villevieille.takima.cloud | CHANGED => {
       - name: app-network
 ```
 
-- dans le httpd.conf
+## main.yml pour roles/app
+```yml
+- name: api
+  docker_container:
+    name: api
+    image: heavenshk/tp-devops-cpe:backend
+    networks:
+      - name: app-network
+```
+
+## main.yml dans le httpd.conf
 ```yml
  
     ProxyPass / http://frontend:80/
@@ -448,7 +503,7 @@ florian.villevieille.takima.cloud | CHANGED => {
 
 ```
 
-- creation du docker
+## main.yml dans le docker
 ```yml
   frontend:
     build:
