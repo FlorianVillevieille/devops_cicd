@@ -27,6 +27,8 @@ docker run --network=app-network -p 8080:8080 adminer
 
 ##  Dockerfile de la base de données
 
+Dans ce cas, les scripts python sont lancés au début
+
 ```docker
 FROM postgres:11.6-alpine
 
@@ -41,12 +43,15 @@ COPY /02-insertData.sql /docker-entrypoint-initdb.d
 
 
 ## Persistence des données
+Nous souhaitons conserver nos données et non plus les écraser à chaque lancements.
 ```
 docker run -p 8888:5000 --name database -v /tmp/data:/var/lib/postgresql/data --network app-network  heavenshk/database
 ```
 
 
 # Coté Backend : Le Java
+
+javac Main.java permet de lancer notre application en Java
 
 ## Docker file du coté Backend :
 ```docker
@@ -110,7 +115,7 @@ COPY index.html /usr/local/apache2/htdocs/
 docker run -dit --name my-running-app -p 8082:80 --network app-network web_server
 ```
 
-## Modification de la configuration en vue de faire du reverse proxy
+## Modification de la configuration 
 ```
 docker run --rm httpd:2.4 cat /usr/local/apache2/conf/httpd.conf > my-httpd.conf
 ```
@@ -126,7 +131,6 @@ COPY ./my-httpd.conf /usr/local/apache2/conf/httpd.conf
 Cette fois-ci, on autorise le reverse proxy. api ici correspond au docker de mon coté backend
 
 ```docker
-
 ServerName localhost
 
 <VirtualHost *:80>
@@ -142,17 +146,18 @@ docker run --name my-running-app -p 80:80 --network app-network web_server
 ```
 ## Quelques commandes pour manipuler docker compose 
 ```
->docker-compose up
+>docker-compose up #lancer le docker-compose
 
 >docker-compose up --build
 
->docker-compose restart api
+>docker-compose restart api #redemarrer un des docker
+
+>docker-compose down #eteindre les containers
 ```
 ## Fichier docker-compose
 Ce fichier permet de lancer tous les processus docker en même temps, sans avoir à les démarrer un par un. Il tient compte des priorités et de chaques docker file.
 
 ```docker
-
 version: '3.3'
 services:
   api:
@@ -186,7 +191,7 @@ networks:
 
 ## Publication des images que l'on utilise sur docker Hub.
 
-Cela permet de versionner les images et qu'elles soient accessible partout.
+Cela permet de versionner les images et qu'elles soient accessible partout. également nous pouvons la modifier pendant qu'une version qui fonctionne en est prod.
 ```
 > docker tag tp01_httpd heavenshk/httpd:1.0
 
@@ -218,7 +223,6 @@ Cela permet de versionner les images et qu'elles soient accessible partout.
 ```
 # Github Actions
 ```yml
-
 name: CI devops 2022 CPE
 on:
   #to begin you want to launch this job in main and develop
@@ -242,7 +246,6 @@ jobs:
       - name: Build and test with Maven
       #Maven est exécuté sur notre projet Java pour effectuer des tests
         run: mvn clean verify --file ./TP01/Javaa/simple-api-main/simple-api
-
 ```
 
 Ici Maven possède un outil de review de code. selon les paramètres que l'ont choisit, il est capable d'analyser et d'en ressortir une note. généralemnt les équipes projets utilise une barre à 80% avant d'envoyer ce code en production.
@@ -255,7 +258,6 @@ Les Secrets sont stockés dans github via des variables secrètes
 ## Quality Gate configuration
 
 ```yml
-
 name: CI devops 2022 CPE
 on:
   #to begin you want to launch this job in main and develop
@@ -331,7 +333,6 @@ jobs:
             ${{secrets.USERDOCKERHUB}}/tp-devops-cpe:simple-frontend
           # push action
           push: ${{ github.ref == 'refs/heads/main' }}
-
 ```
 
 Dans les "balises" context, on cherche à aller chercher les fichiers Dockerfile de chaque image

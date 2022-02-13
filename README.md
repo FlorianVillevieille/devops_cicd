@@ -1,4 +1,6 @@
-# Compte rendu TP1
+# Reponses aux questions
+
+Tous les README des TP's sont situés dans le fichier Commandtext.md
 #### FlorianVILLEVIEILLE
 #
 
@@ -16,22 +18,24 @@
 puis pour éxecuter le -jar avec le JRE. le JRE reste plus léger
 
 #### Why do we need a reverse proxy ?
-
-# TP2
+>Le rôle du proxy inverse va être de transmettre tous les requètes des utilisateurs au serveur mais en protégeant l'identité du serveur.
+çela augmente les performances (équilibrage de charge) mais aussi la sécurité (DDOS protection)
+# 
 
 #### Why is docker-compose so important ?
 
 #### 2-1 What are testcontainers?
 
-> c'est une bibliothèque Java qui permet d'instancier des 
+> c'est une bibliothèque Java qui permet d'instancier des conteneurs dockers au sein des tests unitaires. par contre on souhaite tester une bdd postgres, on va pouvoir executer une image docker postgres
 #### Why do we put our images into an online repository ?
 
 > Pour avoir du versionning d'images
+pouvoir continuer de modifier une image en ayant une toujours en production.
+Egalement pour pouvoir l'utiliser dans plusieurs applications
 
  
 
 
 
 #### Secured variables, why ?
-
-#### For what purpose do we need to push docker images?
+> la variable est désormais disponible à l'utilisation dans le code (secret.VARIABLE) mais elle n'est pas accessible globalement. c'est a dire que quand on essaye de grep dessus, ou de la trouver, elle n'est pas disponible.
