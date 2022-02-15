@@ -22,8 +22,7 @@ Informations complémentaires :
 ### Docker ? les bonnes pratiques :
 - Image la plus légère possible
 - chaque processus doit reposer sur son propre container
-- scalabilité horizontal : plus de serveurs
-- scalabilité vertical : plus de ressources pour serveurs
+
 
 ## Créer un réseau :
 ```
