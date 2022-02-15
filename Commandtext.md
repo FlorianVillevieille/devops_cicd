@@ -100,7 +100,7 @@ docker run -d --name backend -p 8080:8080 heavenshk/backend
 FROM maven:3.6.3-jdk-11 AS myapp-build #Import de maven
 ENV MYAPP_HOME /opt/myapp
 WORKDIR $MYAPP_HOME #notre repertoire de travail
-COPY pom.xml . #on importe pom.xml et src
+COPY pom.xml . #on importe pom.xml (fichier de conf) et src
 COPY src ./src
 RUN mvn package -DskipTests #Permet d'éxecuter maven
 # 
