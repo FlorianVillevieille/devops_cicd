@@ -253,7 +253,8 @@ Ici Maven possède un outil de review de code. selon les paramètres que l'ont c
 
 >docker login -u heavenshk
 
-Les Secrets sont stockés dans github via des variables secrètes
+Les Secrets sont stockés dans github via des variables secrètes. Ici on dispose des identifiants pour se connecter au github mais aussi au dockerhub pour y enregistrer les images.
+Un des gros avantage de github actions, est qu'il existe qu'un seul fichier de configuration.
 
 ## Quality Gate configuration
 
@@ -335,12 +336,15 @@ jobs:
           push: ${{ github.ref == 'refs/heads/main' }}
 ```
 
-Dans les "balises" context, on cherche à aller chercher les fichiers Dockerfile de chaque image
+Dans les "balises" context, on cherche à aller chercher les fichiers Dockerfile de chaque image.
+Egalement à chaque envoi, on s'authentifie au dockerhub et  on y enregistre les images nouvellement créée sous le nom précisé dans le tag.  
 
 -------------------
 # READ ME - TP3
 
 ## Commandes ansible :
+
+
 ```
 ansible all -i inventory.yml -m ping
 ```
@@ -536,4 +540,7 @@ Ce fichier va permettre d'appeler tous les rôles que l'ont aura au préalable c
     ProxyPassReverse / http://frontend:80/
 
 ```
-
+Au niveau du front, on précise notre API.
+```
+VUE_APP_API_URL=florian.villevieille.takima.cloud/api
+```
