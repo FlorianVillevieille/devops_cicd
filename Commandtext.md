@@ -377,6 +377,7 @@ ansible all -i inventory.yml -m ping
 
 Il est important de noter que le -i permet de passer par un host, car les PC de CPE ne permettait pas d'ouvrir le fichier /etc/host. Il faut également une clef RSA
 
+## inventory.yml
 ```yml
 
 all:
