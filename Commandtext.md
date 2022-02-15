@@ -458,7 +458,28 @@ ansible-playbook -i inventory.yml playbook.yml
 ```
 > ansible-playbook -i inventory.yml playbook.yml
 ```
-## Le playbook : 
+
+
+
+Ce fichier va permettre d'appeler tous les rôles que l'ont aura au préalable configuré dans roles/"docker ou api ou front"/tasks/main.yml par exemple.
+
+## playbook.yml
+
+```yml
+- hosts: all
+  gather_facts: false
+  become: yes
+
+  roles:
+    - docker
+    - network
+    - database
+    - app
+    - proxy
+    - front
+```
+
+## rôles/docker/tasks/main.yml : 
 
 Ici on spécifie les configurations d'installations pour docker.
 ```yml
@@ -494,26 +515,6 @@ Ici on spécifie les configurations d'installations pour docker.
   - name: Make sure Docker is running
     service: name=docker state=started
     tags: docker
-```
-
-
-Ce fichier va permettre d'appeler tous les rôles que l'ont aura au préalable configuré dans roles/"docker ou api ou front"/tasks/main.yml par exemple.
-
-### main.yml
-
-```yml
-- hosts: all
-  gather_facts: false
-  become: yes
-
-  roles:
-    - docker
-    - network
-    - database
-    - app
-    - proxy
-    - front
-    
 ```
 
 
