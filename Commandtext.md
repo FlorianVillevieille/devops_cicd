@@ -7,7 +7,23 @@ Informations complémentaires :
 - Dans mon architecture se trouve deux fichiers, Backend et Javaa. Le dossier Backend est l'api généré et non pas donné par vous au long du TP. Elle n'est plus utilisé par la suite, seule le dossier Javaa reste utilisé malgrè le nom "Backend" utilisé plusieurs fois
 - Certains fichiers Docker/Docker-compose/Github actions ont été documentés dans un second temps, il se peut que les commentaires n'apparaissent que dans le READ-me et pas le fichier originel :)
 
+
+
 # Base de données
+
+## Docker tips
+- -t rajoute un tag au build que l'on veut créer.
+- -d lance le contenaire en arrière plan
+- -it on a une console pour faire du debugage 
+- -e pour préciser certaines variables
+- le premier port : port exposé, le deuxième port : port hôte
+- docker ps : permet de voir les processus docker qui tournent.
+
+### Docker ? les bonnes pratiques :
+- Image la plus légère possible
+- chaque processus doit reposer sur son propre container
+- scalabilité horizontal : plus de serveurs
+- scalabilité vertical : plus de ressources pour serveurs
 
 ## Créer un réseau :
 ```
@@ -82,20 +98,22 @@ docker run -d --name backend -p 8080:8080 heavenshk/backend
 ## Docker file Spring
 ```docker
 # Build
-FROM maven:3.6.3-jdk-11 AS myapp-build
+FROM maven:3.6.3-jdk-11 AS myapp-build #Import de maven
 ENV MYAPP_HOME /opt/myapp
-WORKDIR $MYAPP_HOME
-COPY pom.xml .
+WORKDIR $MYAPP_HOME #notre repertoire de travail
+COPY pom.xml . #on importe pom.xml et src
 COPY src ./src
-RUN mvn package -DskipTests
-# Run
+RUN mvn package -DskipTests #Permet d'éxecuter maven
+# 
 
-FROM openjdk:11-jre
+FROM openjdk:11-jre #on importe openjdk
 ENV MYAPP_HOME /opt/myapp
-WORKDIR $MYAPP_HOME
+WORKDIR $MYAPP_HOME #definition du repertoire de travail
 COPY --from=myapp-build $MYAPP_HOME/target/*.jar $MYAPP_HOME/myapp.jar
-ENTRYPOINT java -jar myapp.jar
+ENTRYPOINT java -jar myapp.jar #il s 'agit de l'exe à executer au démarrage
 ```
+
+
 Cette commande permet de supprimer les processus docker qui tournent en fond
 >docker rm -f nomduprocessus /ou\ idduprocessus
 
@@ -155,7 +173,7 @@ docker run --name my-running-app -p 80:80 --network app-network web_server
 >docker-compose down #eteindre les containers
 ```
 ## Fichier docker-compose
-Ce fichier permet de lancer tous les processus docker en même temps, sans avoir à les démarrer un par un. Il tient compte des priorités et de chaques docker file.
+Ce fichier permet de lancer tous les processus docker en même temps, sans avoir à les démarrer un par un. Il tient compte des priorités de chaques docker file.
 
 ```docker
 version: '3.3'
@@ -213,6 +231,8 @@ Cela permet de versionner les images et qu'elles soient accessible partout. éga
 
 ## Quelques commandes git pour gérer au mieux son dossier git.
 ```
+>git diff
+
 >git status
 
 >git add .
@@ -220,7 +240,12 @@ Cela permet de versionner les images et qu'elles soient accessible partout. éga
 >git commit -m "message"
 
 >git push origin master/main
+
+>créer une branche : git branch maBrancheui
+>changer de branche : git checkout
 ```
+le dossier .git dans notre dossier permet de gérer la configuration. (les commits etc.)
+le .gitignore lui, permet de spécifier si on veut prendre en compte certains fichiers.
 # Github Actions
 ```yml
 name: CI devops 2022 CPE
@@ -342,9 +367,11 @@ Egalement à chaque envoi, on s'authentifie au dockerhub et  on y enregistre les
 -------------------
 # READ ME - TP3
 
+
+## Ansible ?
+- c'est un logiciel qui automatise les déploiements. il utilise la communication par SSH (un exemple de cryptage)
+- Il possède : un playbook.yml qui résume tous ce que doit effectuer ansible. un fichier inventories.yml qui va spécifier l'hote et permettre d'utiliser la clef SSH. un dossier roles/tintin pour chaque rôles. dans chacun de ces fichiers un main.yml pour permettre une configuration séparé de chaque rôles. 
 ## Commandes ansible :
-
-
 ```
 ansible all -i inventory.yml -m ping
 ```
@@ -535,10 +562,8 @@ Ce fichier va permettre d'appeler tous les rôles que l'ont aura au préalable c
 
 ## dans le httpd.conf pour autoriser le front
 ```yml
- 
     ProxyPass / http://frontend:80/
     ProxyPassReverse / http://frontend:80/
-
 ```
 Au niveau du front, on précise notre API.
 ```
