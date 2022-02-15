@@ -33,9 +33,8 @@ puis pour éxecuter le -jar avec le JRE. le JRE reste plus léger
 pouvoir continuer de modifier une image en ayant une toujours en production.
 Egalement pour pouvoir l'utiliser dans plusieurs applications
 
->mvn clean verify
 
-#### what is supposed to do ?
+#### mvn clean verify what is supposed to do ?
 > Cela effectue des tests sur notre code. permet de vérifier la qualité du code.
 
 #### Unit tests ? component tests ?
